@@ -6,17 +6,21 @@ from django.db.models import Count
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
-from trending.managers import TrendingManager
+from django.contrib.auth.models import User
+
+from django.utils.timezone import utc
+
+from .managers import TrendingManager
 
 
 class DateTimeAuditModel(models.Model):
     
-    created_at = models.DateTimeField(default=datetime.datetime.now)
-    modified_at = models.DateTimeField(default=datetime.datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    modified_at = models.DateTimeField(auto_now=True)
     
     def save(self, *args, **kwargs):
         if self.pk is not None:
-            self.modified_at = datetime.datetime.now()
+            self.modified_at = datetime.datetime.utcnow().replace(tzinfo=utc)
         super(DateTimeAuditModel, self).save(*args, **kwargs)
     
     class Meta:
@@ -26,8 +30,10 @@ class DateTimeAuditModel(models.Model):
 
 class ViewLog(DateTimeAuditModel):
     
+    user = models.ForeignKey(User, null=True, blank=True)
+
     session_key = models.CharField(max_length=40)
-    
+
     viewed_content_type = models.ForeignKey(ContentType)
     viewed_object_id = models.PositiveIntegerField()
     viewed_object = generic.GenericForeignKey(
@@ -36,11 +42,6 @@ class ViewLog(DateTimeAuditModel):
     )
     
     kind = models.CharField(max_length=50, blank=True) # Used to optionally delineate records that share a content type
-    
-    class Meta:
-        unique_together = (
-            ("session_key", "viewed_content_type", "viewed_object_id"),
-        )
 
 
 class DailyViewSummary(DateTimeAuditModel):
