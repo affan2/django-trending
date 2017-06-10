@@ -3,8 +3,10 @@ import datetime
 from django.db import models
 from django.db.models import Count
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from django.contrib.sites.models import Site
 
 from django.contrib.auth.models import User
 
@@ -31,16 +33,14 @@ class DateTimeAuditModel(models.Model):
 class ViewLog(DateTimeAuditModel):
     
     user = models.ForeignKey(User, null=True, blank=True)
-
     session_key = models.CharField(max_length=40)
-
     viewed_content_type = models.ForeignKey(ContentType)
     viewed_object_id = models.PositiveIntegerField()
     viewed_object = generic.GenericForeignKey(
         ct_field="viewed_content_type",
         fk_field="viewed_object_id"
     )
-    
+    site = models.ForeignKey(Site, default=settings.SITE_ID, verbose_name='site')
     kind = models.CharField(max_length=50, blank=True) # Used to optionally delineate records that share a content type
 
 
@@ -55,7 +55,7 @@ class DailyViewSummary(DateTimeAuditModel):
         ct_field="viewed_content_type",
         fk_field="viewed_object_id"
     )
-    
+    site = models.ForeignKey(Site, default=settings.SITE_ID, verbose_name='site')
     kind = models.CharField(max_length=50, blank=True) # Used to optionally delineate records that share a content type
     
     objects = TrendingManager()
@@ -70,13 +70,15 @@ class DailyViewSummary(DateTimeAuditModel):
         qs = ViewLog.objects.filter(
             created_at__year=for_date.year,
             created_at__month=for_date.month,
-            created_at__day=for_date.day
+            created_at__day=for_date.day,
+            site_id=settings.SITE_ID
         )
         
         if view_log:
             qs = qs.filter(
                 viewed_content_type = view_log.viewed_content_type,
-                viewed_object_id = view_log.viewed_object_id
+                viewed_object_id = view_log.viewed_object_id,
+                site_id=settings.SITE_ID
             )
         
         qs = qs.values(
@@ -89,11 +91,12 @@ class DailyViewSummary(DateTimeAuditModel):
         
         for view in qs:
             summary, created = DailyViewSummary.objects.get_or_create(
-                views_on = for_date,
-                viewed_content_type = ContentType.objects.get(pk=view["viewed_content_type"]),
-                viewed_object_id = view["viewed_object_id"],
-                kind = view["kind"],
-                defaults = {"count": view["num_views"]}
+                views_on=for_date,
+                viewed_content_type=ContentType.objects.get(pk=view["viewed_content_type"]),
+                viewed_object_id=view["viewed_object_id"],
+                kind=view["kind"],
+                defaults={"count": view["num_views"]},
+                site_id=settings.SITE_ID
             )
             if not created:
                 summary.count = view["num_views"]
