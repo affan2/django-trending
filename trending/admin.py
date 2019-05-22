@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from trending.models import DailyViewSummary, ViewLog
+from .models import DailyViewSummary, ViewLog
 
 
 admin.site.register(DailyViewSummary)

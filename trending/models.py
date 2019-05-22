@@ -5,7 +5,7 @@ from django.db.models import Count
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.sites.models import Site
 
 from django.contrib.auth.models import User
@@ -32,16 +32,17 @@ class DateTimeAuditModel(models.Model):
 
 class ViewLog(DateTimeAuditModel):
     
-    user = models.ForeignKey(User, null=True, blank=True)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     session_key = models.CharField(max_length=40)
-    viewed_content_type = models.ForeignKey(ContentType)
+    viewed_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     viewed_object_id = models.PositiveIntegerField()
-    viewed_object = generic.GenericForeignKey(
+    viewed_object = GenericForeignKey(
         ct_field="viewed_content_type",
         fk_field="viewed_object_id"
     )
-    site = models.ForeignKey(Site, default=settings.SITE_ID, verbose_name='site')
-    kind = models.CharField(max_length=50, blank=True) # Used to optionally delineate records that share a content type
+    site = models.ForeignKey(Site, default=settings.SITE_ID, verbose_name='site', on_delete=models.CASCADE)
+    # Used to optionally delineate records that share a content type
+    kind = models.CharField(max_length=50, blank=True)
 
 
 class DailyViewSummary(DateTimeAuditModel):
@@ -49,15 +50,15 @@ class DailyViewSummary(DateTimeAuditModel):
     views_on = models.DateField()
     count = models.PositiveIntegerField()
     
-    viewed_content_type = models.ForeignKey(ContentType)
+    viewed_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     viewed_object_id = models.PositiveIntegerField()
-    viewed_object = generic.GenericForeignKey(
+    viewed_object = GenericForeignKey(
         ct_field="viewed_content_type",
         fk_field="viewed_object_id"
     )
-    site = models.ForeignKey(Site, default=settings.SITE_ID, verbose_name='site')
-    kind = models.CharField(max_length=50, blank=True) # Used to optionally delineate records that share a content type
-    
+    site = models.ForeignKey(Site, default=settings.SITE_ID, verbose_name='site', on_delete=models.CASCADE)
+    # Used to optionally delineate records that share a content type
+    kind = models.CharField(max_length=50, blank=True)
     objects = TrendingManager()
     
     class Meta:
@@ -76,8 +77,8 @@ class DailyViewSummary(DateTimeAuditModel):
         
         if view_log:
             qs = qs.filter(
-                viewed_content_type = view_log.viewed_content_type,
-                viewed_object_id = view_log.viewed_object_id,
+                viewed_content_type=view_log.viewed_content_type,
+                viewed_object_id=view_log.viewed_object_id,
                 site_id=settings.SITE_ID
             )
         
