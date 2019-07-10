@@ -14,3 +14,4 @@ Installation
         # other apps
         "trending",
     )
+
