@@ -32,15 +32,15 @@ class DateTimeAuditModel(models.Model):
 
 class ViewLog(DateTimeAuditModel):
     
-    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE, related_name="ViewLogUser")
     session_key = models.CharField(max_length=40)
-    viewed_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    viewed_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name="VLViewedContentType")
     viewed_object_id = models.PositiveIntegerField()
     viewed_object = GenericForeignKey(
         ct_field="viewed_content_type",
         fk_field="viewed_object_id"
     )
-    site = models.ForeignKey(Site, default=settings.SITE_ID, verbose_name='site', on_delete=models.CASCADE)
+    site = models.ForeignKey(Site, default=settings.SITE_ID, verbose_name='site', on_delete=models.CASCADE, related_name="ViewLogSite")
     # Used to optionally delineate records that share a content type
     kind = models.CharField(max_length=50, blank=True)
 
@@ -50,13 +50,13 @@ class DailyViewSummary(DateTimeAuditModel):
     views_on = models.DateField()
     count = models.PositiveIntegerField()
     
-    viewed_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    viewed_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name="DVSViewedContentType")
     viewed_object_id = models.PositiveIntegerField()
     viewed_object = GenericForeignKey(
         ct_field="viewed_content_type",
         fk_field="viewed_object_id"
     )
-    site = models.ForeignKey(Site, default=settings.SITE_ID, verbose_name='site', on_delete=models.CASCADE)
+    site = models.ForeignKey(Site, default=settings.SITE_ID, verbose_name='site', on_delete=models.CASCADE, related_name="DailyViewSummarySite")
     # Used to optionally delineate records that share a content type
     kind = models.CharField(max_length=50, blank=True)
     objects = TrendingManager()
