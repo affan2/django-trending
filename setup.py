@@ -93,7 +93,7 @@ def find_package_data(
                         break
                 if bad_name:
                     continue
-                out.setdefault(package, []).append(prefix+name)
+                out.setdefault(package, []).append(prefix + name)
     return out
 
 
@@ -110,7 +110,7 @@ setup(
     name=NAME,
     version=VERSION,
     description=DESCRIPTION,
-    long_description=read("README.md"),
+    long_description=read("README.rst"),
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     license="BSD",
@@ -128,4 +128,3 @@ setup(
     ],
     zip_safe=False,
 )
-
