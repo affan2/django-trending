@@ -6,7 +6,23 @@ Home-page: http://django-trending.rtfd.org
 Author: Patrick Altman
 Author-email: paltman@eldarion.com
 License: BSD
-Description: # django-trending
+Description: django-trending
+        ---------------
+        .. image:: https://img.shields.io/travis/eldarion/django-trending.svg
+            :target: https://travis-ci.org/eldarion/django-trending
+        
+        .. image:: https://img.shields.io/coveralls/eldarion/django-trending.svg
+            :target: https://coveralls.io/r/eldarion/django-trending
+        
+        .. image:: https://img.shields.io/pypi/dm/django-trending.svg
+            :target:  https://pypi.python.org/pypi/django-trending/
+        
+        .. image:: https://img.shields.io/pypi/v/django-trending.svg
+            :target:  https://pypi.python.org/pypi/django-trending/
+        
+        .. image:: https://img.shields.io/badge/license-BSD-blue.svg
+            :target:  https://pypi.python.org/pypi/django-trending/
+        
         
         django-trending is an app that provides a generic way to capture view counts
         of generic objects and keep daily summary totals for purposes of enabling the
