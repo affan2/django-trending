@@ -11,5 +11,4 @@ trending/admin.py
 trending/managers.py
 trending/models.py
 trending/migrations/0001_initial.py
-trending/migrations/0002_auto_20190710_0920.py
 trending/migrations/__init__.py
